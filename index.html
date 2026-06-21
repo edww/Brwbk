@@ -4,15 +4,18 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#f6f2ea" />
-  <title>Brewbook</title>
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="stylesheet" href="style.css" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Brewbook v4</title>
+  <link rel="manifest" href="manifest.webmanifest?v=4" />
+  <link rel="stylesheet" href="style.css?v=4" />
 </head>
 <body>
   <header class="app-header">
     <div>
       <p class="eyebrow">Carnet café local</p>
-      <h1>Brewbook</h1>
+      <h1>Brewbook <span class="version-badge">v4</span></h1>
     </div>
     <button id="quickAddBtn" class="primary small">+ Shot</button>
   </header>
@@ -83,11 +86,13 @@
 
     <section id="backup" class="panel">
       <div class="card stack">
-        <h2>Sauvegarde</h2>
+        <h2>Sauvegarde <span class="version-badge">v4</span></h2>
+        <p class="muted build-line">Build : 2026-06-21 17:45 · anti-cache actif</p>
         <p class="muted">Toutes les données sont stockées sur ce téléphone dans le navigateur. Exporte régulièrement un JSON pour sauvegarder ou transférer.</p>
         <div class="actions">
           <button id="exportBtn" class="primary">Exporter JSON</button>
           <label class="file-label">Importer JSON<input id="importInput" type="file" accept="application/json" /></label>
+          <button id="forceRefreshBtn" class="ghost" type="button">Forcer la mise à jour</button>
         </div>
       </div>
       <div class="card stack danger-zone">
@@ -156,12 +161,13 @@
   <dialog id="tasteModal" class="modal">
     <div class="stack taste-modal-card">
       <div class="section-head compact">
-        <h2>Triangle espresso</h2>
+        <h2>Coffee Compass <span class="version-badge">v4</span></h2>
         <button class="ghost" type="button" onclick="document.getElementById('tasteModal').close()">Fermer</button>
       </div>
-      <p class="muted">Clique sur le défaut dominant. L’idée est de guider le prochain shot, pas de faire une vérité absolue.</p>
+      <p class="muted">Clique sur le défaut dominant. Centre = zone équilibrée ; bords = directions de correction pour le prochain shot.</p>
       <div class="espresso-triangle" aria-label="Triangle de diagnostic espresso">
-        <button class="taste-node top" data-problem="bitter" type="button">Amer<br><span>trop extrait</span></button>
+        <div class="triangle-guide">ÉQUILIBRE</div>
+        <button class="taste-node top" data-problem="bitter" type="button">Amer<br><span>sur-extrait</span></button>
         <button class="taste-node left" data-problem="sour" type="button">Acide<br><span>sous-extrait</span></button>
         <button class="taste-node right" data-problem="dry" type="button">Sec / terreux<br><span>astringent</span></button>
         <button class="taste-node center" data-problem="weak" type="button">Plat / aqueux<br><span>manque de corps</span></button>
@@ -171,6 +177,6 @@
     </div>
   </dialog>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>

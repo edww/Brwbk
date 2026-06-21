@@ -1,41 +1,27 @@
-# Brewbook
+# Brewbook v4
 
-Carnet de bord café simple, mobile-first, sans serveur et sans npm.
+Carnet café mobile en HTML/CSS/JS vanilla.
 
-## Fichiers
+## V4
+
+- Badge `v4` visible à côté du titre Brewbook.
+- Version/build visibles dans l'onglet Export.
+- Bouton `Forcer la mise à jour` pour vider caches/service worker.
+- Fichiers appelés en `?v=4` pour éviter le cache Safari/GitHub Pages.
+- Coffee Compass / triangle espresso amélioré.
+- Bouton Modifier sur cafés, recettes, moulins, machines et shots.
+- Stockage local sur le téléphone via `localStorage`.
+- Export/import JSON.
+
+## Mise en ligne
+
+Uploade/remplace tous les fichiers à la racine du dépôt GitHub :
 
 - `index.html`
 - `style.css`
 - `app.js`
-- `manifest.webmanifest`
 - `sw.js`
+- `manifest.webmanifest`
+- `README.md`
 
-## Utilisation
-
-1. Uploader les fichiers dans un repo GitHub.
-2. Activer GitHub Pages ou connecter le repo à Netlify.
-3. Ouvrir l’URL sur iPhone.
-4. Ajouter à l’écran d’accueil si besoin.
-
-## Données
-
-Les données sont stockées localement dans le navigateur via `localStorage`.
-
-L’onglet **Export** permet :
-
-- exporter toutes les données en JSON ;
-- réimporter un JSON ;
-- transférer les données vers un autre téléphone.
-
-Les photos sont intégrées au JSON en base64. C’est pratique, mais les exports peuvent devenir gros.
-
-## V1 inclut
-
-- Historique des shots/extractions
-- Cafés
-- Recettes de référence
-- Moulins
-- Machines
-- Photos
-- Export/import JSON
-- Mode hors ligne basique via service worker
+Après upload, ouvre une fois le site avec `?v=4` à la fin de l’URL.

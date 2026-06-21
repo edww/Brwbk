@@ -1,4 +1,6 @@
 const STORE_KEY = 'brewbook.v2';
+const APP_VERSION = 'v4';
+const BUILD_LABEL = '2026-06-21 17:45';
 const OLD_STORE_KEY = 'brewbook.v1';
 const methods = ['Espresso', 'Turbo shot', 'Americano', 'Aerocano / iced americano vapeur', 'V60', 'Aeropress', 'French press', 'Cold brew', 'Moka'];
 const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
@@ -202,26 +204,30 @@ handleForm('machineEditor','machines', async fd => ({name:fd.get('name'), type:f
 const advice = {
   sour: {
     title:'Acide / piquant / citron vert',
-    text:'Probable sous-extraction. Essaie : moudre plus fin, augmenter le rendement légèrement, augmenter le temps de contact, ou monter un peu la température. Si le shot coule très vite, commence par plus fin.'
+    text:'Probable sous-extraction.',
+    tips:['Moudre plus fin','Augmenter légèrement le rendement','Augmenter le temps de contact','Monter un peu la température','Si le shot coule très vite : commencer par plus fin']
   },
   bitter: {
     title:'Amer / brûlé / médicament',
-    text:'Probable sur-extraction ou café trop poussé. Essaie : moudre plus gros, réduire le rendement, baisser un peu la température, ou raccourcir le shot. Sur Americano/Aerocano, enlever la crema peut aider.'
+    text:'Probable sur-extraction ou café trop poussé.',
+    tips:['Moudre plus gros','Réduire le rendement','Baisser un peu la température','Raccourcir le shot','Pour Americano/Aerocano : enlever la crema peut aider']
   },
   dry: {
     title:'Sec / terreux / astringent',
-    text:'Souvent extraction inégale ou channeling. Essaie : meilleure répartition, WDT, tassage plus régulier, mouture un poil plus grosse, panier adapté, et vérifie que le bottomless ne gicle pas.'
+    text:'Souvent extraction inégale, channeling ou torréfaction poussée.',
+    tips:['Améliorer la répartition / WDT','Tasser plus régulièrement','Moudre un poil plus gros','Réduire un peu le rendement','Vérifier le panier et le bottomless']
   },
   weak: {
     title:'Plat / aqueux / manque de corps',
-    text:'Souvent trop dilué ou pas assez extrait. Essaie : réduire le rendement, augmenter la dose, moudre un peu plus fin, ou viser un ratio plus court. Si le goût est clair mais mince, baisse surtout la sortie.'
+    text:'Souvent trop dilué ou pas assez concentré.',
+    tips:['Réduire le rendement','Augmenter un peu la dose','Moudre un peu plus fin','Viser un ratio plus court','Si le goût est clair mais mince : baisser surtout la sortie']
   }
 };
 function setAdvice(key){
   const a = advice[key];
   if(!a) return;
-  currentAdvice = `${a.title} — ${a.text}`;
-  document.getElementById('tasteAdvice').innerHTML = `<strong>${esc(a.title)}</strong><br>${esc(a.text)}`;
+  currentAdvice = `${a.title} — ${a.text} ${a.tips.map(t=>'• '+t).join(' ')}`;
+  document.getElementById('tasteAdvice').innerHTML = `<strong>${esc(a.title)}</strong><br>${esc(a.text)}<ul>${a.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
 }
 window.openTaste = function(brewId=''){
   if(brewId) editing = {collection:'brews', id:brewId};
@@ -258,5 +264,29 @@ document.getElementById('importInput').addEventListener('change', e => {
 });
 document.getElementById('resetBtn').addEventListener('click',()=>{ if(confirm('Remettre les données de démo ?')){ db = structuredClone(defaults); save(); } });
 
-if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+const refreshBtn = document.getElementById('forceRefreshBtn');
+if(refreshBtn){
+  refreshBtn.addEventListener('click', async () => {
+    try {
+      if('serviceWorker' in navigator){
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r => r.unregister()));
+      }
+      if('caches' in window){
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+    } catch(e) {}
+    const base = location.href.split('?')[0];
+    location.href = `${base}?${APP_VERSION}-${Date.now()}`;
+  });
+}
+
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    registrations.forEach(registration => registration.unregister());
+  }).catch(() => {});
+}
+
 render();
