@@ -7,15 +7,15 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>Brewbook v4</title>
-  <link rel="manifest" href="manifest.webmanifest?v=4" />
-  <link rel="stylesheet" href="style.css?v=4" />
+  <title>Brewbook v5</title>
+  <link rel="manifest" href="manifest.webmanifest?v=5" />
+  <link rel="stylesheet" href="style.css?v=5" />
 </head>
 <body>
   <header class="app-header">
     <div>
       <p class="eyebrow">Carnet café local</p>
-      <h1>Brewbook <span class="version-badge">v4</span></h1>
+      <h1>Brewbook <span class="version-badge">v5</span></h1>
     </div>
     <button id="quickAddBtn" class="primary small">+ Shot</button>
   </header>
@@ -86,8 +86,8 @@
 
     <section id="backup" class="panel">
       <div class="card stack">
-        <h2>Sauvegarde <span class="version-badge">v4</span></h2>
-        <p class="muted build-line">Build : 2026-06-21 17:45 · anti-cache actif</p>
+        <h2>Sauvegarde <span class="version-badge">v5</span></h2>
+        <p class="muted build-line">Build : 2026-06-21 17:55 · anti-cache actif</p>
         <p class="muted">Toutes les données sont stockées sur ce téléphone dans le navigateur. Exporte régulièrement un JSON pour sauvegarder ou transférer.</p>
         <div class="actions">
           <button id="exportBtn" class="primary">Exporter JSON</button>
@@ -121,7 +121,7 @@
       <select name="rating">
         <option value="">Note</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
       </select>
-      <div class="taste-row"><button type="button" class="ghost taste-open" data-taste-open>Triangle espresso</button><span class="muted small-text">Aide rapide acidité / amertume / corps.</span></div>
+      <div class="taste-row"><button type="button" class="ghost taste-open" data-taste-open>Triangle espresso</button><span class="muted small-text">Aide dial-in : acidité, amertume, corps, astringence, channeling.</span></div>
       <textarea name="notes" placeholder="Notes de goût, défauts, ajustement à faire…"></textarea>
       <label class="photo-field">Photo tasse/grains<input name="photo" type="file" accept="image/*" /></label>
       <menu><button value="cancel" class="ghost">Annuler</button><button class="primary" value="default">Enregistrer</button></menu>
@@ -161,22 +161,46 @@
   <dialog id="tasteModal" class="modal">
     <div class="stack taste-modal-card">
       <div class="section-head compact">
-        <h2>Coffee Compass <span class="version-badge">v4</span></h2>
+        <h2>Coffee Compass <span class="version-badge">v5</span></h2>
         <button class="ghost" type="button" onclick="document.getElementById('tasteModal').close()">Fermer</button>
       </div>
-      <p class="muted">Clique sur le défaut dominant. Centre = zone équilibrée ; bords = directions de correction pour le prochain shot.</p>
-      <div class="espresso-triangle" aria-label="Triangle de diagnostic espresso">
-        <div class="triangle-guide">ÉQUILIBRE</div>
-        <button class="taste-node top" data-problem="bitter" type="button">Amer<br><span>sur-extrait</span></button>
-        <button class="taste-node left" data-problem="sour" type="button">Acide<br><span>sous-extrait</span></button>
-        <button class="taste-node right" data-problem="dry" type="button">Sec / terreux<br><span>astringent</span></button>
-        <button class="taste-node center" data-problem="weak" type="button">Plat / aqueux<br><span>manque de corps</span></button>
+      <p class="muted">Clique sur le mot le plus proche de ta tasse. Plus le mot est loin du centre, plus la correction doit être importante.</p>
+      <div class="compass-wrap" aria-label="Coffee Compass diagnostic espresso">
+        <div class="compass-axis axis-top">SUR-EXTRAIT / DUR</div>
+        <div class="compass-axis axis-left">SOUS-EXTRAIT</div>
+        <div class="compass-axis axis-right">ASTRINGENT / SEC</div>
+        <div class="compass-axis axis-bottom">MANQUE DE CORPS</div>
+        <button class="compass-node center" data-problem="balanced" type="button">Équilibré</button>
+
+        <button class="compass-node p-sweet" data-problem="sweet" type="button">Sucré</button>
+        <button class="compass-node p-juicy" data-problem="juicy" type="button">Juteux</button>
+        <button class="compass-node p-syrupy" data-problem="syrupy" type="button">Sirupeux</button>
+
+        <button class="compass-node p-sour" data-problem="sour" type="button">Acide</button>
+        <button class="compass-node p-lemon" data-problem="lemon" type="button">Citron vert</button>
+        <button class="compass-node p-vegetal" data-problem="vegetal" type="button">Végétal</button>
+        <button class="compass-node p-salty" data-problem="salty" type="button">Salé</button>
+
+        <button class="compass-node p-flat" data-problem="flat" type="button">Plat</button>
+        <button class="compass-node p-thin" data-problem="thin" type="button">Mince</button>
+        <button class="compass-node p-watery" data-problem="watery" type="button">Aqueux</button>
+        <button class="compass-node p-hollow" data-problem="hollow" type="button">Creux</button>
+
+        <button class="compass-node p-bitter" data-problem="bitter" type="button">Amer</button>
+        <button class="compass-node p-burnt" data-problem="burnt" type="button">Brûlé</button>
+        <button class="compass-node p-medicinal" data-problem="medicinal" type="button">Médicament</button>
+        <button class="compass-node p-heavy" data-problem="heavy" type="button">Lourd</button>
+
+        <button class="compass-node p-dry" data-problem="dry" type="button">Sec</button>
+        <button class="compass-node p-earthy" data-problem="earthy" type="button">Terreux</button>
+        <button class="compass-node p-woody" data-problem="woody" type="button">Boisé</button>
+        <button class="compass-node p-channel" data-problem="channel" type="button">Acide + amer</button>
       </div>
       <div id="tasteAdvice" class="advice-box">Choisis une zone du triangle.</div>
       <button id="appendAdviceBtn" class="primary" type="button">Ajouter ce conseil aux notes du shot</button>
     </div>
   </dialog>
 
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>

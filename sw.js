@@ -1,4 +1,4 @@
-// Service worker volontairement neutre en V4 : pas de cache, suppression des anciens caches.
+// Service worker volontairement neutre en V5 : pas de cache, suppression des anciens caches.
 self.addEventListener('install', event => self.skipWaiting());
 self.addEventListener('activate', event => {
   event.waitUntil(caches.keys().then(keys => Promise.all(keys.map(key => caches.delete(key)))).then(() => self.clients.claim()));
