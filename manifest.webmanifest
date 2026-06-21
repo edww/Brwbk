@@ -1,0 +1,9 @@
+{
+  "name": "Brewbook",
+  "short_name": "Brewbook",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f6f2ea",
+  "theme_color": "#f6f2ea",
+  "icons": []
+}
