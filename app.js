@@ -1,5 +1,6 @@
-const STORE_KEY = 'brewbook.v1';
-const methods = ['Espresso', 'Turbo shot', 'Americano', 'V60', 'Aeropress', 'French press', 'Cold brew', 'Moka'];
+const STORE_KEY = 'brewbook.v2';
+const OLD_STORE_KEY = 'brewbook.v1';
+const methods = ['Espresso', 'Turbo shot', 'Americano', 'Aerocano / iced americano vapeur', 'V60', 'Aeropress', 'French press', 'Cold brew', 'Moka'];
 const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
 const today = () => new Date().toISOString().slice(0,10);
 
@@ -19,6 +20,7 @@ const defaults = {
     {id: uid(), name:'V60', type:'Filtre', notes:'Dripper manuel.'}
   ],
   recipes: [
+    {id: uid(), name:'Aerocano / iced americano vapeur', method:'Aerocano / iced americano vapeur', source:'James Hoffmann', video:'', guide:'1. Préparer un espresso propre, par exemple 18 g in → 36–40 g out.\n2. Enlever la crema si elle est très amère.\n3. Dans un pichet : 65 g eau froide + 85 g glaçons.\n4. Ajouter l’espresso.\n5. Envoyer 8 à 12 s de vapeur pour aérer sans trop chauffer.\n6. Verser dans un verre froid ou sur glace.'},
     {id: uid(), name:'Americano — base James Hoffmann', method:'Americano', source:'James Hoffmann', video:'', guide:'1. Préparer un espresso propre, par exemple 18 g in → 36 g out.\n2. Chauffer l’eau séparément.\n3. Verser l’eau dans la tasse, puis l’espresso par-dessus.\n4. Ajuster entre 90 et 140 g d’eau selon intensité voulue.'},
     {id: uid(), name:'Turbo shot', method:'Turbo shot', source:'Lance Hedrick / turbo moderne', video:'', guide:'Base de départ : mouture plus grossière, ratio long. Exemple 17–18 g in → 50–60 g out en 15–22 s. Chercher clarté et moins de lourdeur.'},
     {id: uid(), name:'V60 simple 20 g', method:'V60', source:'Brewbook', video:'', guide:'20 g café, 320–340 g eau. Départ K2 75–84 clics selon café. Ajuster si écoulement trop rapide ou goût plat.'}
@@ -27,33 +29,46 @@ const defaults = {
 };
 
 defaults.brews.push({id:uid(), date:today(), coffeeId:defaults.coffees[0].id, method:'V60', grinderId:defaults.grinders[0].id, machineId:defaults.machines[2].id, dose:'20', yield:'340', time:'150', grind:'75 clics', water:'Eau chaude, ratio 1:17', rating:'3', notes:'Démo : un peu rapide, ouvrir/fermer selon résultat.', photo:''});
-
 defaults.brews.push({id:uid(), date:today(), coffeeId:defaults.coffees[1].id, method:'Turbo shot', grinderId:defaults.grinders[1].id, machineId:defaults.machines[0].id, dose:'18', yield:'60', time:'16', grind:'à noter', water:'', rating:'3', notes:'Démo : très rapide, possible channeling au bottomless.', photo:''});
 
 let db = load();
+let editing = null;
+let currentAdvice = '';
+
+const formConfig = {
+  brews: {dialog:'brewForm', form:'brewEditor', titleAdd:'Ajouter un shot', titleEdit:'Modifier le shot'},
+  coffees: {dialog:'coffeeForm', form:'coffeeEditor', titleAdd:'Ajouter un café', titleEdit:'Modifier le café'},
+  recipes: {dialog:'recipeForm', form:'recipeEditor', titleAdd:'Ajouter une recette', titleEdit:'Modifier la recette'},
+  grinders: {dialog:'grinderForm', form:'grinderEditor', titleAdd:'Ajouter un moulin', titleEdit:'Modifier le moulin'},
+  machines: {dialog:'machineForm', form:'machineEditor', titleAdd:'Ajouter une machine', titleEdit:'Modifier la machine'}
+};
 
 function load(){
-  const raw = localStorage.getItem(STORE_KEY);
+  const raw = localStorage.getItem(STORE_KEY) || localStorage.getItem(OLD_STORE_KEY);
   if(!raw){ localStorage.setItem(STORE_KEY, JSON.stringify(defaults)); return structuredClone(defaults); }
-  try { return JSON.parse(raw); } catch { return structuredClone(defaults); }
+  try {
+    const data = JSON.parse(raw);
+    if(!data.recipes) data.recipes = [];
+    if(!data.brews) data.brews = [];
+    localStorage.setItem(STORE_KEY, JSON.stringify(data));
+    return data;
+  } catch { return structuredClone(defaults); }
 }
 function save(){ localStorage.setItem(STORE_KEY, JSON.stringify(db)); render(); }
 function byId(collection,id){ return (db[collection]||[]).find(x=>x.id===id); }
 function stars(n){ return n ? '★★★★★'.slice(0, Number(n)) : '—'; }
-function esc(s=''){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function esc(s=''){ return String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
 
 function photoToDataUrl(file){
   return new Promise(resolve => {
-    if(!file) return resolve('');
+    if(!file || !file.name) return resolve('');
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
     reader.readAsDataURL(file);
   });
 }
 
-function render(){
-  renderSelects(); renderBrews(); renderCoffees(); renderRecipes(); renderGear(); renderLast();
-}
+function render(){ renderSelects(); renderBrews(); renderCoffees(); renderRecipes(); renderGear(); renderLast(); }
 function renderLast(){
   const last = db.brews[db.brews.length-1];
   const title = document.getElementById('lastBrewTitle');
@@ -65,6 +80,9 @@ function renderLast(){
   title.textContent = `${last.method} — ${coffee}`;
   meta.textContent = `${last.dose||'?'}g → ${last.yield||'?'}g · ${last.time||'?'}s · ${grinder} · ${last.grind||'réglage ?'}`;
   score.textContent = stars(last.rating);
+}
+function itemActions(collection, id, extra=''){
+  return `<div class="item-actions">${extra}<button class="ghost" onclick="editItem('${collection}','${id}')">Modifier</button><button class="ghost" onclick="removeItem('${collection}','${id}')">Supprimer</button></div>`;
 }
 function renderBrews(){
   const el = document.getElementById('brewList');
@@ -79,7 +97,7 @@ function renderBrews(){
       <p>${esc(b.dose||'?')}g → ${esc(b.yield||'?')}g · ${esc(b.time||'?')}s · ${esc(b.grind||'réglage ?')}</p>
       <p class="muted">${esc(grinder)} · ${esc(machine)} · ${stars(b.rating)}</p>
       ${b.notes ? `<p>${esc(b.notes)}</p>` : ''}
-      <button class="ghost" onclick="removeItem('brews','${b.id}')">Supprimer</button>
+      ${itemActions('brews', b.id, `<button class="ghost" onclick="openTaste('${b.id}')">Triangle</button>`)}
     </article>`;
   }).join('') || '<p class="muted">Aucun shot pour l’instant.</p>';
 }
@@ -89,7 +107,7 @@ function renderCoffees(){
     <div class="item-top"><strong>${esc(c.name)}</strong><span class="pill">${esc(c.roast||'')}</span></div>
     <p class="muted">${esc(c.roaster||'')} · ${esc(c.origin||'')} · ${esc(c.process||'')}</p>
     ${c.notes ? `<p>${esc(c.notes)}</p>` : ''}
-    <button class="ghost" onclick="removeItem('coffees','${c.id}')">Supprimer</button>
+    ${itemActions('coffees', c.id)}
   </article>`).join('') || '<p class="muted">Aucun café.</p>';
 }
 function renderRecipes(){
@@ -98,15 +116,16 @@ function renderRecipes(){
     <p class="muted">${esc(r.source||'')}</p>
     <p>${esc(r.guide||'').replaceAll('\n','<br>')}</p>
     ${r.video ? `<a href="${esc(r.video)}" target="_blank" rel="noreferrer">Voir la vidéo</a>` : ''}
-    <button class="ghost" onclick="removeItem('recipes','${r.id}')">Supprimer</button>
+    ${itemActions('recipes', r.id)}
   </article>`).join('');
 }
 function renderGear(){
-  document.getElementById('grinderList').innerHTML = db.grinders.map(g => `<article class="item"><div class="item-top"><strong>${esc(g.name)}</strong><span class="pill">${esc(g.unit||'')}</span></div><p class="muted">${esc(g.notes||'')}</p><button class="ghost" onclick="removeItem('grinders','${g.id}')">Supprimer</button></article>`).join('');
-  document.getElementById('machineList').innerHTML = db.machines.map(m => `<article class="item"><div class="item-top"><strong>${esc(m.name)}</strong><span class="pill">${esc(m.type||'')}</span></div><p class="muted">${esc(m.notes||'')}</p><button class="ghost" onclick="removeItem('machines','${m.id}')">Supprimer</button></article>`).join('');
+  document.getElementById('grinderList').innerHTML = db.grinders.map(g => `<article class="item"><div class="item-top"><strong>${esc(g.name)}</strong><span class="pill">${esc(g.unit||'')}</span></div><p class="muted">${esc(g.notes||'')}</p>${itemActions('grinders', g.id)}</article>`).join('');
+  document.getElementById('machineList').innerHTML = db.machines.map(m => `<article class="item"><div class="item-top"><strong>${esc(m.name)}</strong><span class="pill">${esc(m.type||'')}</span></div><p class="muted">${esc(m.notes||'')}</p>${itemActions('machines', m.id)}</article>`).join('');
 }
 function renderSelects(){
-  document.querySelector('#brewEditor [name="coffeeId"]').innerHTML = db.coffees.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  const coffeeSelect = document.querySelector('#brewEditor [name="coffeeId"]');
+  if(coffeeSelect) coffeeSelect.innerHTML = db.coffees.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
   document.querySelector('#brewEditor [name="grinderId"]').innerHTML = '<option value="">Moulin</option>'+db.grinders.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('');
   document.querySelector('#brewEditor [name="machineId"]').innerHTML = '<option value="">Machine</option>'+db.machines.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('');
   document.querySelector('#brewEditor [name="method"]').innerHTML = methods.map(m=>`<option>${m}</option>`).join('');
@@ -115,29 +134,114 @@ function renderSelects(){
 
 window.removeItem = function(collection, id){
   if(confirm('Supprimer cet élément ?')){ db[collection] = db[collection].filter(x=>x.id!==id); save(); }
+};
+
+window.editItem = function(collection, id){
+  const config = formConfig[collection];
+  const item = byId(collection, id);
+  if(!config || !item) return;
+  editing = {collection, id};
+  renderSelects();
+  const dialog = document.getElementById(config.dialog);
+  const form = document.getElementById(config.form);
+  const title = form.querySelector('[data-title]');
+  if(title) title.textContent = config.titleEdit;
+  form.reset();
+  [...form.elements].forEach(el => {
+    if(!el.name || el.type === 'file') return;
+    if(item[el.name] !== undefined) el.value = item[el.name];
+  });
+  dialog.showModal();
+};
+
+function openAdd(dialogId){
+  const dialog = document.getElementById(dialogId);
+  const config = Object.values(formConfig).find(c=>c.dialog === dialogId);
+  if(config){
+    const form = document.getElementById(config.form);
+    const title = form.querySelector('[data-title]');
+    editing = null;
+    form.reset();
+    if(title) title.textContent = config.titleAdd;
+  }
+  renderSelects();
+  dialog.showModal();
 }
 
 document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{
   document.querySelectorAll('.tab,.panel').forEach(x=>x.classList.remove('active'));
   btn.classList.add('active'); document.getElementById(btn.dataset.tab).classList.add('active');
 }));
-document.querySelectorAll('[data-open]').forEach(btn=>btn.addEventListener('click',()=>document.getElementById(btn.dataset.open).showModal()));
-document.getElementById('quickAddBtn').addEventListener('click',()=>document.getElementById('brewForm').showModal());
+document.querySelectorAll('[data-open]').forEach(btn=>btn.addEventListener('click',()=>openAdd(btn.dataset.open)));
+document.getElementById('quickAddBtn').addEventListener('click',()=>openAdd('brewForm'));
+
+document.querySelectorAll('dialog form').forEach(form=>{
+  form.addEventListener('reset', () => { editing = null; });
+});
 
 async function handleForm(formId, collection, mapper){
   const form = document.getElementById(formId);
   form.addEventListener('submit', async e => {
     e.preventDefault();
     const fd = new FormData(form);
-    const item = await mapper(fd);
-    db[collection].push(item); form.reset(); form.closest('dialog').close(); save();
+    const fresh = await mapper(fd);
+    if(editing && editing.collection === collection){
+      db[collection] = db[collection].map(item => item.id === editing.id ? {...item, ...fresh, id: editing.id} : item);
+    } else {
+      db[collection].push({id:uid(), ...fresh});
+    }
+    editing = null; form.reset(); form.closest('dialog').close(); save();
   });
 }
-handleForm('brewEditor','brews', async fd => ({id:uid(), date:today(), coffeeId:fd.get('coffeeId'), method:fd.get('method'), grinderId:fd.get('grinderId'), machineId:fd.get('machineId'), dose:fd.get('dose'), yield:fd.get('yield'), time:fd.get('time'), grind:fd.get('grind'), water:fd.get('water'), rating:fd.get('rating'), notes:fd.get('notes'), photo:await photoToDataUrl(fd.get('photo'))}));
-handleForm('coffeeEditor','coffees', async fd => ({id:uid(), name:fd.get('name'), roaster:fd.get('roaster'), origin:fd.get('origin'), process:fd.get('process'), roast:fd.get('roast'), notes:fd.get('notes'), photo:await photoToDataUrl(fd.get('photo'))}));
-handleForm('recipeEditor','recipes', async fd => ({id:uid(), name:fd.get('name'), method:fd.get('method'), source:fd.get('source'), video:fd.get('video'), guide:fd.get('guide')}));
-handleForm('grinderEditor','grinders', async fd => ({id:uid(), name:fd.get('name'), unit:fd.get('unit'), notes:fd.get('notes')}));
-handleForm('machineEditor','machines', async fd => ({id:uid(), name:fd.get('name'), type:fd.get('type'), notes:fd.get('notes')}));
+handleForm('brewEditor','brews', async fd => ({date:today(), coffeeId:fd.get('coffeeId'), method:fd.get('method'), grinderId:fd.get('grinderId'), machineId:fd.get('machineId'), dose:fd.get('dose'), yield:fd.get('yield'), time:fd.get('time'), grind:fd.get('grind'), water:fd.get('water'), rating:fd.get('rating'), notes:fd.get('notes'), photo:(await photoToDataUrl(fd.get('photo'))) || (editing ? byId('brews', editing.id)?.photo || '' : '')}));
+handleForm('coffeeEditor','coffees', async fd => ({name:fd.get('name'), roaster:fd.get('roaster'), origin:fd.get('origin'), process:fd.get('process'), roast:fd.get('roast'), notes:fd.get('notes'), photo:(await photoToDataUrl(fd.get('photo'))) || (editing ? byId('coffees', editing.id)?.photo || '' : '')}));
+handleForm('recipeEditor','recipes', async fd => ({name:fd.get('name'), method:fd.get('method'), source:fd.get('source'), video:fd.get('video'), guide:fd.get('guide')}));
+handleForm('grinderEditor','grinders', async fd => ({name:fd.get('name'), unit:fd.get('unit'), notes:fd.get('notes')}));
+handleForm('machineEditor','machines', async fd => ({name:fd.get('name'), type:fd.get('type'), notes:fd.get('notes')}));
+
+const advice = {
+  sour: {
+    title:'Acide / piquant / citron vert',
+    text:'Probable sous-extraction. Essaie : moudre plus fin, augmenter le rendement légèrement, augmenter le temps de contact, ou monter un peu la température. Si le shot coule très vite, commence par plus fin.'
+  },
+  bitter: {
+    title:'Amer / brûlé / médicament',
+    text:'Probable sur-extraction ou café trop poussé. Essaie : moudre plus gros, réduire le rendement, baisser un peu la température, ou raccourcir le shot. Sur Americano/Aerocano, enlever la crema peut aider.'
+  },
+  dry: {
+    title:'Sec / terreux / astringent',
+    text:'Souvent extraction inégale ou channeling. Essaie : meilleure répartition, WDT, tassage plus régulier, mouture un poil plus grosse, panier adapté, et vérifie que le bottomless ne gicle pas.'
+  },
+  weak: {
+    title:'Plat / aqueux / manque de corps',
+    text:'Souvent trop dilué ou pas assez extrait. Essaie : réduire le rendement, augmenter la dose, moudre un peu plus fin, ou viser un ratio plus court. Si le goût est clair mais mince, baisse surtout la sortie.'
+  }
+};
+function setAdvice(key){
+  const a = advice[key];
+  if(!a) return;
+  currentAdvice = `${a.title} — ${a.text}`;
+  document.getElementById('tasteAdvice').innerHTML = `<strong>${esc(a.title)}</strong><br>${esc(a.text)}`;
+}
+window.openTaste = function(brewId=''){
+  if(brewId) editing = {collection:'brews', id:brewId};
+  currentAdvice = '';
+  document.getElementById('tasteAdvice').textContent = 'Choisis une zone du triangle.';
+  document.getElementById('tasteModal').showModal();
+};
+document.querySelectorAll('[data-taste-open]').forEach(btn=>btn.addEventListener('click',()=>openTaste(editing?.id || '')));
+document.querySelectorAll('[data-problem]').forEach(btn=>btn.addEventListener('click',()=>setAdvice(btn.dataset.problem)));
+document.getElementById('appendAdviceBtn').addEventListener('click',()=>{
+  if(!currentAdvice) return;
+  const textarea = document.querySelector('#brewEditor [name="notes"]');
+  if(document.getElementById('brewForm').open && textarea){
+    textarea.value = [textarea.value, currentAdvice].filter(Boolean).join('\n');
+  } else if(editing?.collection === 'brews'){
+    const b = byId('brews', editing.id);
+    if(b){ b.notes = [b.notes, currentAdvice].filter(Boolean).join('\n'); save(); }
+  }
+  document.getElementById('tasteModal').close();
+});
 
 document.getElementById('exportBtn').addEventListener('click',()=>{
   const blob = new Blob([JSON.stringify(db,null,2)], {type:'application/json'});

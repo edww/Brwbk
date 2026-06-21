@@ -99,7 +99,7 @@
 
   <dialog id="brewForm" class="modal">
     <form method="dialog" class="stack" id="brewEditor">
-      <h2>Ajouter un shot</h2>
+      <h2 data-title>Ajouter un shot</h2>
       <select name="coffeeId" required></select>
       <select name="method" required></select>
       <select name="grinderId"></select>
@@ -116,6 +116,7 @@
       <select name="rating">
         <option value="">Note</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
       </select>
+      <div class="taste-row"><button type="button" class="ghost taste-open" data-taste-open>Triangle espresso</button><span class="muted small-text">Aide rapide acidité / amertume / corps.</span></div>
       <textarea name="notes" placeholder="Notes de goût, défauts, ajustement à faire…"></textarea>
       <label class="photo-field">Photo tasse/grains<input name="photo" type="file" accept="image/*" /></label>
       <menu><button value="cancel" class="ghost">Annuler</button><button class="primary" value="default">Enregistrer</button></menu>
@@ -124,7 +125,7 @@
 
   <dialog id="coffeeForm" class="modal">
     <form method="dialog" class="stack" id="coffeeEditor">
-      <h2>Ajouter un café</h2>
+      <h2 data-title>Ajouter un café</h2>
       <input name="name" required placeholder="Nom du café" />
       <input name="roaster" placeholder="Torréfacteur" />
       <div class="row"><input name="origin" placeholder="Origine" /><input name="process" placeholder="Process" /></div>
@@ -137,7 +138,7 @@
 
   <dialog id="recipeForm" class="modal">
     <form method="dialog" class="stack" id="recipeEditor">
-      <h2>Ajouter une recette</h2>
+      <h2 data-title>Ajouter une recette</h2>
       <input name="name" required placeholder="Nom" />
       <select name="method"></select>
       <input name="source" placeholder="Source / auteur" />
@@ -147,8 +148,28 @@
     </form>
   </dialog>
 
-  <dialog id="grinderForm" class="modal"><form method="dialog" class="stack" id="grinderEditor"><h2>Ajouter un moulin</h2><input name="name" required placeholder="Nom" /><input name="unit" placeholder="Unité: clics, repère, micron…" /><textarea name="notes" placeholder="Notes"></textarea><menu><button value="cancel" class="ghost">Annuler</button><button class="primary" value="default">Enregistrer</button></menu></form></dialog>
-  <dialog id="machineForm" class="modal"><form method="dialog" class="stack" id="machineEditor"><h2>Ajouter une machine</h2><input name="name" required placeholder="Nom" /><input name="type" placeholder="Espresso, filtre, bouilloire…" /><textarea name="notes" placeholder="Notes"></textarea><menu><button value="cancel" class="ghost">Annuler</button><button class="primary" value="default">Enregistrer</button></menu></form></dialog>
+  <dialog id="grinderForm" class="modal"><form method="dialog" class="stack" id="grinderEditor"><h2 data-title>Ajouter un moulin</h2><input name="name" required placeholder="Nom" /><input name="unit" placeholder="Unité: clics, repère, micron…" /><textarea name="notes" placeholder="Notes"></textarea><menu><button value="cancel" class="ghost">Annuler</button><button class="primary" value="default">Enregistrer</button></menu></form></dialog>
+  <dialog id="machineForm" class="modal"><form method="dialog" class="stack" id="machineEditor"><h2 data-title>Ajouter une machine</h2><input name="name" required placeholder="Nom" /><input name="type" placeholder="Espresso, filtre, bouilloire…" /><textarea name="notes" placeholder="Notes"></textarea><menu><button value="cancel" class="ghost">Annuler</button><button class="primary" value="default">Enregistrer</button></menu></form></dialog>
+
+
+
+  <dialog id="tasteModal" class="modal">
+    <div class="stack taste-modal-card">
+      <div class="section-head compact">
+        <h2>Triangle espresso</h2>
+        <button class="ghost" type="button" onclick="document.getElementById('tasteModal').close()">Fermer</button>
+      </div>
+      <p class="muted">Clique sur le défaut dominant. L’idée est de guider le prochain shot, pas de faire une vérité absolue.</p>
+      <div class="espresso-triangle" aria-label="Triangle de diagnostic espresso">
+        <button class="taste-node top" data-problem="bitter" type="button">Amer<br><span>trop extrait</span></button>
+        <button class="taste-node left" data-problem="sour" type="button">Acide<br><span>sous-extrait</span></button>
+        <button class="taste-node right" data-problem="dry" type="button">Sec / terreux<br><span>astringent</span></button>
+        <button class="taste-node center" data-problem="weak" type="button">Plat / aqueux<br><span>manque de corps</span></button>
+      </div>
+      <div id="tasteAdvice" class="advice-box">Choisis une zone du triangle.</div>
+      <button id="appendAdviceBtn" class="primary" type="button">Ajouter ce conseil aux notes du shot</button>
+    </div>
+  </dialog>
 
   <script src="app.js"></script>
 </body>
