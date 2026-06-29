@@ -1,6 +1,6 @@
 const STORE_KEY = 'brewbook.v2';
-const APP_VERSION = 'v5';
-const BUILD_LABEL = '2026-06-21 17:55';
+const APP_VERSION = 'v6';
+const BUILD_LABEL = '2026-06-29';
 const OLD_STORE_KEY = 'brewbook.v1';
 const methods = ['Espresso', 'Turbo shot', 'Americano', 'Aerocano / iced americano vapeur', 'V60', 'Aeropress', 'French press', 'Cold brew', 'Moka'];
 const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
@@ -56,7 +56,7 @@ function load(){
     return data;
   } catch { return structuredClone(defaults); }
 }
-function save(){ localStorage.setItem(STORE_KEY, JSON.stringify(db)); render(); }
+function save(){ if(safeSave()) render(); }
 function byId(collection,id){ return (db[collection]||[]).find(x=>x.id===id); }
 function stars(n){ return n ? '★★★★★'.slice(0, Number(n)) : '—'; }
 function esc(s=''){ return String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
@@ -64,10 +64,36 @@ function esc(s=''){ return String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;',
 function photoToDataUrl(file){
   return new Promise(resolve => {
     if(!file || !file.name) return resolve('');
+
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const maxSide = 1200;
+        const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', 0.72));
+      };
+      img.onerror = () => resolve('');
+      img.src = reader.result;
+    };
+    reader.onerror = () => resolve('');
     reader.readAsDataURL(file);
   });
+}
+
+function safeSave(){
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(db));
+    return true;
+  } catch(e) {
+    alert('Image trop lourde : le café n’a pas été enregistré. Essaie sans photo ou avec une image plus légère.');
+    return false;
+  }
 }
 
 function render(){ renderSelects(); renderBrews(); renderCoffees(); renderRecipes(); renderGear(); renderLast(); }
@@ -187,12 +213,17 @@ async function handleForm(formId, collection, mapper){
     e.preventDefault();
     const fd = new FormData(form);
     const fresh = await mapper(fd);
+    const previous = structuredClone(db[collection]);
     if(editing && editing.collection === collection){
       db[collection] = db[collection].map(item => item.id === editing.id ? {...item, ...fresh, id: editing.id} : item);
     } else {
       db[collection].push({id:uid(), ...fresh});
     }
-    editing = null; form.reset(); form.closest('dialog').close(); save();
+    if(!safeSave()){
+      db[collection] = previous;
+      return;
+    }
+    editing = null; form.reset(); form.closest('dialog').close(); render();
   });
 }
 handleForm('brewEditor','brews', async fd => ({date:today(), coffeeId:fd.get('coffeeId'), method:fd.get('method'), grinderId:fd.get('grinderId'), machineId:fd.get('machineId'), dose:fd.get('dose'), yield:fd.get('yield'), time:fd.get('time'), grind:fd.get('grind'), water:fd.get('water'), rating:fd.get('rating'), notes:fd.get('notes'), photo:(await photoToDataUrl(fd.get('photo'))) || (editing ? byId('brews', editing.id)?.photo || '' : '')}));
@@ -281,6 +312,22 @@ if(refreshBtn){
     location.href = `${base}?${APP_VERSION}-${Date.now()}`;
   });
 }
+
+function isStandalone(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+function setupInstallBanner(){
+  const banner = document.getElementById('installBanner');
+  const close = document.getElementById('installBannerClose');
+  if(!banner || !close) return;
+  const dismissed = localStorage.getItem('brewbook.installBanner.dismissed') === '1';
+  if(!dismissed && !isStandalone()) banner.hidden = false;
+  close.addEventListener('click', () => {
+    localStorage.setItem('brewbook.installBanner.dismissed', '1');
+    banner.hidden = true;
+  });
+}
+setupInstallBanner();
 
 
 if ('serviceWorker' in navigator) {

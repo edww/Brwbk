@@ -7,18 +7,26 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>Brewbook v5</title>
-  <link rel="manifest" href="manifest.webmanifest?v=5" />
-  <link rel="stylesheet" href="style.css?v=5" />
+  <title>Brewbook v6</title>
+  <link rel="manifest" href="manifest.webmanifest?v=6" />
+  <link rel="stylesheet" href="style.css?v=6" />
 </head>
 <body>
   <header class="app-header">
     <div>
       <p class="eyebrow">Carnet café local</p>
-      <h1>Brewbook <span class="version-badge">v5</span></h1>
+      <h1>Brewbook <span class="version-badge">v6</span></h1>
     </div>
     <button id="quickAddBtn" class="primary small">+ Shot</button>
   </header>
+
+  <div id="installBanner" class="install-banner" hidden>
+    <div>
+      <strong>Ajouter Brewbook à l’écran d’accueil</strong>
+      <p>Sur iPhone : touche <span aria-hidden="true">Partager</span> puis “Sur l’écran d’accueil”.</p>
+    </div>
+    <button id="installBannerClose" class="ghost small" type="button" aria-label="Fermer le bandeau">×</button>
+  </div>
 
   <main>
     <section class="hero card">
@@ -86,8 +94,8 @@
 
     <section id="backup" class="panel">
       <div class="card stack">
-        <h2>Sauvegarde <span class="version-badge">v5</span></h2>
-        <p class="muted build-line">Build : 2026-06-21 17:55 · anti-cache actif</p>
+        <h2>Sauvegarde <span class="version-badge">v6</span></h2>
+        <p class="muted build-line">Build : 2026-06-29 · images allégées · process prédéfinis</p>
         <p class="muted">Toutes les données sont stockées sur ce téléphone dans le navigateur. Exporte régulièrement un JSON pour sauvegarder ou transférer.</p>
         <div class="actions">
           <button id="exportBtn" class="primary">Exporter JSON</button>
@@ -133,7 +141,7 @@
       <h2 data-title>Ajouter un café</h2>
       <input name="name" required placeholder="Nom du café" />
       <input name="roaster" placeholder="Torréfacteur" />
-      <div class="row"><input name="origin" placeholder="Origine" /><input name="process" placeholder="Process" /></div>
+      <div class="row"><input name="origin" placeholder="Origine" /><select name="process"><option value="">Process</option><option>Lavé</option><option>Nature</option><option>Honey</option><option>Yellow honey</option><option>Red honey</option><option>Black honey</option><option>Anaérobie</option><option>Fermentation anaérobie</option><option>Carbonic maceration</option><option>Co-fermenté</option><option>Décaféiné</option><option>Experimental</option></select></div>
       <select name="roast"><option>Claire</option><option>Moyenne</option><option>Moyenne +</option><option>Foncée</option></select>
       <textarea name="notes" placeholder="Notes aromatiques"></textarea>
       <label class="photo-field">Photo grains/sachet<input name="photo" type="file" accept="image/*" /></label>
@@ -161,7 +169,7 @@
   <dialog id="tasteModal" class="modal">
     <div class="stack taste-modal-card">
       <div class="section-head compact">
-        <h2>Coffee Compass <span class="version-badge">v5</span></h2>
+        <h2>Coffee Compass <span class="version-badge">v6</span></h2>
         <button class="ghost" type="button" onclick="document.getElementById('tasteModal').close()">Fermer</button>
       </div>
       <p class="muted">Clique sur le mot le plus proche de ta tasse. Plus le mot est loin du centre, plus la correction doit être importante.</p>
@@ -201,6 +209,6 @@
     </div>
   </dialog>
 
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>
