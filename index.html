@@ -7,10 +7,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Brewbook" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>Brewbook v0.7</title>
-  <link rel="manifest" href="manifest.webmanifest?v=0.7" />
-  <link rel="apple-touch-icon" href="icons/icon-180.png?v=0.7" />
-  <link rel="stylesheet" href="style.css?v=0.7" />
+  <title>Brewbook v0.7.2</title>
+  <link rel="manifest" href="manifest.webmanifest?v=0.7.2" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+  <link rel="stylesheet" href="style.css?v=0.7.2" />
 </head>
 <body>
   <div id="installTip" class="install-tip" hidden>
@@ -20,7 +22,7 @@
   </div>
 
   <header class="app-header">
-    <div class="brand"><div><p class="eyebrow">Carnet café local</p><h1>Brewbook <span>v0.7</span></h1></div><div class="brand-mark">b</div></div>
+    <div class="brand"><div><p class="eyebrow">Carnet café local</p><h1>Brewbook <span>v0.7.2</span></h1></div><div class="brand-mark">b</div></div>
     <button id="quickAddBtn" class="primary small">+ Extraction</button>
   </header>
 
@@ -57,6 +59,6 @@
 
   <dialog id="helpModal" class="modal"><div class="stack help-card"><div class="section-head"><h2 id="helpTitle">Aide</h2><button class="ghost" onclick="document.getElementById('helpModal').close()">Fermer</button></div><div id="helpBody"></div></div></dialog>
   <dialog id="tasteModal" class="modal"><div class="stack help-card"><div class="section-head"><h2>Coffee Compass</h2><button class="ghost" onclick="document.getElementById('tasteModal').close()">Fermer</button></div><p class="muted">Clique sur le mot le plus proche de ta tasse.</p><div class="compass-wrap" id="compassNodes"></div><div id="tasteAdvice" class="advice-box">Choisis une zone.</div><button id="appendAdviceBtn" class="primary">Ajouter ce conseil aux notes</button></div></dialog>
-  <script type="module" src="js/app.js?v=0.7"></script>
+  <script type="module" src="js/app.js?v=0.7.2"></script>
 </body>
 </html>
