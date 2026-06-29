@@ -3,212 +3,60 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#f6f2ea" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-  <title>Brewbook v6</title>
-  <link rel="manifest" href="manifest.webmanifest?v=6" />
-  <link rel="stylesheet" href="style.css?v=6" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Brewbook" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>Brewbook v0.7</title>
+  <link rel="manifest" href="manifest.webmanifest?v=0.7" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png?v=0.7" />
+  <link rel="stylesheet" href="style.css?v=0.7" />
 </head>
 <body>
-  <header class="app-header">
-    <div>
-      <p class="eyebrow">Carnet café local</p>
-      <h1>Brewbook <span class="version-badge">v6</span></h1>
-    </div>
-    <button id="quickAddBtn" class="primary small">+ Shot</button>
-  </header>
-
-  <div id="installBanner" class="install-banner" hidden>
-    <div>
-      <strong>Ajouter Brewbook à l’écran d’accueil</strong>
-      <p>Sur iPhone : touche <span aria-hidden="true">Partager</span> puis “Sur l’écran d’accueil”.</p>
-    </div>
-    <button id="installBannerClose" class="ghost small" type="button" aria-label="Fermer le bandeau">×</button>
+  <div id="installTip" class="install-tip" hidden>
+    <div class="mini-logo">b</div>
+    <p><strong>Installer Brewbook</strong><br><span>Sur iPhone : partager → Ajouter à l’écran d’accueil.</span></p>
+    <button id="closeInstallTip" aria-label="Fermer">×</button>
   </div>
+
+  <header class="app-header">
+    <div class="brand"><div><p class="eyebrow">Carnet café local</p><h1>Brewbook <span>v0.7</span></h1></div><div class="brand-mark">b</div></div>
+    <button id="quickAddBtn" class="primary small">+ Extraction</button>
+  </header>
 
   <main>
     <section class="hero card">
-      <div>
-        <p class="eyebrow">Dernier réglage</p>
-        <h2 id="lastBrewTitle">Aucune extraction</h2>
-        <p id="lastBrewMeta" class="muted">Ajoute ton premier café, moulin ou shot.</p>
-      </div>
-      <div class="score" id="lastBrewScore">—</div>
+      <div><p class="eyebrow">Dernière extraction</p><h2 id="lastBrewTitle">Aucune extraction</h2><p id="lastBrewMeta" class="muted">Ajoute ton premier café ou ta première extraction.</p></div>
+      <div class="score" id="lastBrewScore"></div>
     </section>
 
     <nav class="tabs" aria-label="Navigation principale">
-      <button class="tab active" data-tab="brews">Shots</button>
+      <button class="tab active" data-tab="brews">Extractions</button>
       <button class="tab" data-tab="coffees">Cafés</button>
       <button class="tab" data-tab="recipes">Recettes</button>
       <button class="tab" data-tab="gear">Matériel</button>
       <button class="tab" data-tab="backup">Export</button>
     </nav>
 
-    <section id="brews" class="panel active">
-      <div class="section-head">
-        <h2>Historique</h2>
-        <button class="ghost" data-open="brewForm">Ajouter</button>
-      </div>
-      <div id="brewList" class="list"></div>
-    </section>
-
-    <section id="coffees" class="panel">
-      <div class="section-head">
-        <h2>Cafés</h2>
-        <button class="ghost" data-open="coffeeForm">Ajouter</button>
-      </div>
-      <div id="coffeeList" class="grid-list"></div>
-    </section>
-
-    <section id="recipes" class="panel">
-      <div class="section-head">
-        <h2>Recettes</h2>
-        <button class="ghost" data-open="recipeForm">Ajouter</button>
-      </div>
-      <div id="recipeList" class="list"></div>
-    </section>
-
-    <section id="gear" class="panel">
-      <div class="section-head">
-        <h2>Matériel</h2>
-      </div>
-      <div class="two-cols">
-        <div>
-          <div class="section-head compact">
-            <h3>Moulins</h3>
-            <button class="ghost" data-open="grinderForm">+</button>
-          </div>
-          <div id="grinderList" class="list"></div>
-        </div>
-        <div>
-          <div class="section-head compact">
-            <h3>Machines</h3>
-            <button class="ghost" data-open="machineForm">+</button>
-          </div>
-          <div id="machineList" class="list"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="backup" class="panel">
-      <div class="card stack">
-        <h2>Sauvegarde <span class="version-badge">v6</span></h2>
-        <p class="muted build-line">Build : 2026-06-29 · images allégées · process prédéfinis</p>
-        <p class="muted">Toutes les données sont stockées sur ce téléphone dans le navigateur. Exporte régulièrement un JSON pour sauvegarder ou transférer.</p>
-        <div class="actions">
-          <button id="exportBtn" class="primary">Exporter JSON</button>
-          <label class="file-label">Importer JSON<input id="importInput" type="file" accept="application/json" /></label>
-          <button id="forceRefreshBtn" class="ghost" type="button">Forcer la mise à jour</button>
-        </div>
-      </div>
-      <div class="card stack danger-zone">
-        <h3>Réinitialisation</h3>
-        <button id="resetBtn" class="danger">Réinitialiser la démo</button>
-      </div>
-    </section>
+    <section id="brews" class="panel active"><div class="section-head"><h2>Extractions</h2><button class="ghost" data-open="brewForm">Ajouter</button></div><div id="brewList" class="list"></div></section>
+    <section id="coffees" class="panel"><div class="section-head"><h2>Cafés</h2><button class="ghost" data-open="coffeeForm">Ajouter</button></div><div id="coffeeList" class="grid-list"></div></section>
+    <section id="recipes" class="panel"><div class="section-head"><h2>Recettes</h2><button class="ghost" data-open="recipeForm">Ajouter</button></div><div id="recipeList" class="list"></div></section>
+    <section id="gear" class="panel"><div class="two-cols"><div><div class="section-head"><h2>Moulins</h2><button class="ghost" data-open="grinderForm">+</button></div><div id="grinderList" class="list"></div></div><div><div class="section-head"><h2>Machines</h2><button class="ghost" data-open="machineForm">+</button></div><div id="machineList" class="list"></div></div></div></section>
+    <section id="backup" class="panel"><div class="card stack"><h2>Sauvegarde</h2><p class="muted">Données stockées localement sur ce navigateur. Exporte régulièrement un JSON.</p><div class="actions"><button id="exportBtn" class="primary">Exporter JSON</button><label class="file-label">Importer JSON<input id="importInput" type="file" accept="application/json" /></label><button id="forceRefreshBtn" class="ghost">Forcer mise à jour</button></div></div><div class="card stack danger-zone"><h3>Réinitialisation</h3><button id="resetBtn" class="danger">Réinitialiser la démo</button></div></section>
   </main>
 
-  <dialog id="brewForm" class="modal">
-    <form method="dialog" class="stack" id="brewEditor">
-      <h2 data-title>Ajouter un shot</h2>
-      <select name="coffeeId" required></select>
-      <select name="method" required></select>
-      <select name="grinderId"></select>
-      <select name="machineId"></select>
-      <div class="row">
-        <input name="dose" type="number" step="0.1" placeholder="Dose in g" />
-        <input name="yield" type="number" step="0.1" placeholder="Sortie g" />
-      </div>
-      <div class="row">
-        <input name="time" type="number" step="1" placeholder="Temps sec" />
-        <input name="grind" placeholder="Réglage moulin" />
-      </div>
-      <input name="water" placeholder="Eau / ratio / température" />
-      <select name="rating">
-        <option value="">Note</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-      </select>
-      <div class="taste-row"><button type="button" class="ghost taste-open" data-taste-open>Triangle espresso</button><span class="muted small-text">Aide dial-in : acidité, amertume, corps, astringence, channeling.</span></div>
-      <textarea name="notes" placeholder="Notes de goût, défauts, ajustement à faire…"></textarea>
-      <label class="photo-field">Photo tasse/grains<input name="photo" type="file" accept="image/*" /></label>
-      <menu><button value="cancel" class="ghost">Annuler</button><button class="primary" value="default">Enregistrer</button></menu>
-    </form>
-  </dialog>
+  <dialog id="brewForm" class="modal"><form method="dialog" class="stack" id="brewEditor"><h2 data-title>Ajouter une extraction</h2><select name="coffeeId" required></select><div class="row"><select name="method" required></select><select name="rating"><option value="">Note globale</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div><div class="row"><select name="grinderId"></select><select name="machineId"></select></div><div class="row"><input name="dose" type="number" step="0.1" placeholder="Dose in g" /><input name="yield" type="number" step="0.1" placeholder="Sortie g" /></div><div class="row"><input name="time" type="number" step="1" placeholder="Temps sec" /><input name="grind" placeholder="Réglage moulin" /></div><input name="water" placeholder="Eau / ratio / température" />
+    <section class="rating-card"><h3>Critères de dégustation</h3><p class="muted small-text">Les étoiles disent seulement si ce critère t’a plu. Un champ vide ne sera pas affiché.</p><div id="brewCriteria"></div></section>
+    <div class="taste-row"><button type="button" class="ghost taste-open" data-taste-open>Coffee Compass</button><span class="muted small-text">Aide dial-in : acidité, amertume, corps, astringence, channeling.</span></div><textarea name="notes" placeholder="Notes de goût, défauts, ajustement à faire…"></textarea><label class="photo-field">Photo tasse/grains<input name="photo" type="file" accept="image/*" /></label><menu><button value="cancel" class="ghost">Annuler</button><button class="primary" value="default">Enregistrer</button></menu></form></dialog>
 
-  <dialog id="coffeeForm" class="modal">
-    <form method="dialog" class="stack" id="coffeeEditor">
-      <h2 data-title>Ajouter un café</h2>
-      <input name="name" required placeholder="Nom du café" />
-      <input name="roaster" placeholder="Torréfacteur" />
-      <div class="row"><input name="origin" placeholder="Origine" /><select name="process"><option value="">Process</option><option>Lavé</option><option>Nature</option><option>Honey</option><option>Yellow honey</option><option>Red honey</option><option>Black honey</option><option>Anaérobie</option><option>Fermentation anaérobie</option><option>Carbonic maceration</option><option>Co-fermenté</option><option>Décaféiné</option><option>Experimental</option></select></div>
-      <select name="roast"><option>Claire</option><option>Moyenne</option><option>Moyenne +</option><option>Foncée</option></select>
-      <textarea name="notes" placeholder="Notes aromatiques"></textarea>
-      <label class="photo-field">Photo grains/sachet<input name="photo" type="file" accept="image/*" /></label>
-      <menu><button value="cancel" class="ghost">Annuler</button><button class="primary" value="default">Enregistrer</button></menu>
-    </form>
-  </dialog>
+  <dialog id="coffeeForm" class="modal"><form method="dialog" class="stack" id="coffeeEditor"><h2 data-title>Ajouter un café</h2><input name="name" required placeholder="Nom du café" /><input name="roaster" placeholder="Torréfacteur" /><div class="row"><input name="origin" placeholder="Origine" /><select name="process"></select></div><div class="row"><select name="roast"><option value="">Torréfaction</option><option>Claire</option><option>Moyenne</option><option>Moyenne +</option><option>Foncée</option></select><select name="repurchaseRating"><option value="">Je rachèterais ?</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div><textarea name="notes" placeholder="Notes aromatiques"></textarea><label class="photo-field">Photo grains/sachet<input name="photo" type="file" accept="image/*" /></label><menu><button value="cancel" class="ghost">Annuler</button><button class="primary" value="default">Enregistrer</button></menu></form></dialog>
 
-  <dialog id="recipeForm" class="modal">
-    <form method="dialog" class="stack" id="recipeEditor">
-      <h2 data-title>Ajouter une recette</h2>
-      <input name="name" required placeholder="Nom" />
-      <select name="method"></select>
-      <input name="source" placeholder="Source / auteur" />
-      <input name="video" placeholder="Lien vidéo" />
-      <textarea name="guide" placeholder="Guide étape par étape"></textarea>
-      <menu><button value="cancel" class="ghost">Annuler</button><button class="primary" value="default">Enregistrer</button></menu>
-    </form>
-  </dialog>
-
+  <dialog id="recipeForm" class="modal"><form method="dialog" class="stack" id="recipeEditor"><h2 data-title>Ajouter une recette</h2><input name="name" required placeholder="Nom" /><select name="method"></select><input name="source" placeholder="Source / auteur" /><input name="video" placeholder="Lien vidéo" /><textarea name="guide" placeholder="Guide étape par étape"></textarea><menu><button value="cancel" class="ghost">Annuler</button><button class="primary" value="default">Enregistrer</button></menu></form></dialog>
   <dialog id="grinderForm" class="modal"><form method="dialog" class="stack" id="grinderEditor"><h2 data-title>Ajouter un moulin</h2><input name="name" required placeholder="Nom" /><input name="unit" placeholder="Unité: clics, repère, micron…" /><textarea name="notes" placeholder="Notes"></textarea><menu><button value="cancel" class="ghost">Annuler</button><button class="primary" value="default">Enregistrer</button></menu></form></dialog>
   <dialog id="machineForm" class="modal"><form method="dialog" class="stack" id="machineEditor"><h2 data-title>Ajouter une machine</h2><input name="name" required placeholder="Nom" /><input name="type" placeholder="Espresso, filtre, bouilloire…" /><textarea name="notes" placeholder="Notes"></textarea><menu><button value="cancel" class="ghost">Annuler</button><button class="primary" value="default">Enregistrer</button></menu></form></dialog>
 
-
-
-  <dialog id="tasteModal" class="modal">
-    <div class="stack taste-modal-card">
-      <div class="section-head compact">
-        <h2>Coffee Compass <span class="version-badge">v6</span></h2>
-        <button class="ghost" type="button" onclick="document.getElementById('tasteModal').close()">Fermer</button>
-      </div>
-      <p class="muted">Clique sur le mot le plus proche de ta tasse. Plus le mot est loin du centre, plus la correction doit être importante.</p>
-      <div class="compass-wrap" aria-label="Coffee Compass diagnostic espresso">
-        <div class="compass-axis axis-top">SUR-EXTRAIT / DUR</div>
-        <div class="compass-axis axis-left">SOUS-EXTRAIT</div>
-        <div class="compass-axis axis-right">ASTRINGENT / SEC</div>
-        <div class="compass-axis axis-bottom">MANQUE DE CORPS</div>
-        <button class="compass-node center" data-problem="balanced" type="button">Équilibré</button>
-
-        <button class="compass-node p-sweet" data-problem="sweet" type="button">Sucré</button>
-        <button class="compass-node p-juicy" data-problem="juicy" type="button">Juteux</button>
-        <button class="compass-node p-syrupy" data-problem="syrupy" type="button">Sirupeux</button>
-
-        <button class="compass-node p-sour" data-problem="sour" type="button">Acide</button>
-        <button class="compass-node p-lemon" data-problem="lemon" type="button">Citron vert</button>
-        <button class="compass-node p-vegetal" data-problem="vegetal" type="button">Végétal</button>
-        <button class="compass-node p-salty" data-problem="salty" type="button">Salé</button>
-
-        <button class="compass-node p-flat" data-problem="flat" type="button">Plat</button>
-        <button class="compass-node p-thin" data-problem="thin" type="button">Mince</button>
-        <button class="compass-node p-watery" data-problem="watery" type="button">Aqueux</button>
-        <button class="compass-node p-hollow" data-problem="hollow" type="button">Creux</button>
-
-        <button class="compass-node p-bitter" data-problem="bitter" type="button">Amer</button>
-        <button class="compass-node p-burnt" data-problem="burnt" type="button">Brûlé</button>
-        <button class="compass-node p-medicinal" data-problem="medicinal" type="button">Médicament</button>
-        <button class="compass-node p-heavy" data-problem="heavy" type="button">Lourd</button>
-
-        <button class="compass-node p-dry" data-problem="dry" type="button">Sec</button>
-        <button class="compass-node p-earthy" data-problem="earthy" type="button">Terreux</button>
-        <button class="compass-node p-woody" data-problem="woody" type="button">Boisé</button>
-        <button class="compass-node p-channel" data-problem="channel" type="button">Acide + amer</button>
-      </div>
-      <div id="tasteAdvice" class="advice-box">Choisis une zone du triangle.</div>
-      <button id="appendAdviceBtn" class="primary" type="button">Ajouter ce conseil aux notes du shot</button>
-    </div>
-  </dialog>
-
-  <script src="app.js?v=6"></script>
+  <dialog id="helpModal" class="modal"><div class="stack help-card"><div class="section-head"><h2 id="helpTitle">Aide</h2><button class="ghost" onclick="document.getElementById('helpModal').close()">Fermer</button></div><div id="helpBody"></div></div></dialog>
+  <dialog id="tasteModal" class="modal"><div class="stack help-card"><div class="section-head"><h2>Coffee Compass</h2><button class="ghost" onclick="document.getElementById('tasteModal').close()">Fermer</button></div><p class="muted">Clique sur le mot le plus proche de ta tasse.</p><div class="compass-wrap" id="compassNodes"></div><div id="tasteAdvice" class="advice-box">Choisis une zone.</div><button id="appendAdviceBtn" class="primary">Ajouter ce conseil aux notes</button></div></dialog>
+  <script type="module" src="js/app.js?v=0.7"></script>
 </body>
 </html>
